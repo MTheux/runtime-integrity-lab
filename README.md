@@ -7,6 +7,12 @@ how a runtime **self-integrity check** mitigates it.
 It ships a *toy* protection of ~120 lines and a ~110-line patcher. Everything
 targets nothing but the lab's own `victim` process. No real product is involved.
 
+> **📖 Want the full step-by-step reverse-engineering walkthrough?** See
+> [`docs/WALKTHROUGH.md`](docs/WALKTHROUGH.md) — it builds the target, maps the
+> kill-chain in `objdump`, decodes the enforcement `bl` by hand, neutralises it in a
+> live process via `/proc/<pid>/mem`, and then watches the self-CRC mitigation catch
+> the patch. Grounded in real captured output.
+
 ---
 
 ## The idea in one picture
