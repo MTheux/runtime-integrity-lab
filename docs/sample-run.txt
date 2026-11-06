@@ -1,0 +1,46 @@
+== building ==
+ok
+
+== A) baseline: vulnerable, NO patch ==
+   [victim] pid=20
+   [victim] &security_verdict   = 0x400a14
+   [victim] &enforce_termination= 0x400904
+   [victim] self-CRC DISABLED (vulnerable build)
+   [victim] arming window: 6s -- run the patcher now
+   [toy-rasp] verdict=HOSTILE (environment-check) -> terminating process
+   => DEAD (expected DEAD)
+
+== B) attack: vulnerable + /proc/pid/mem NOP ==
+   [victim] pid=31
+   [victim] &security_verdict   = 0x400a14
+   [victim] &enforce_termination= 0x400904
+   [victim] self-CRC DISABLED (vulnerable build)
+   [victim] arming window: 6s -- run the patcher now
+   [victim] tick=0 survived (verdict did not terminate us)
+   [victim] tick=1 survived (verdict did not terminate us)
+   
+   [patcher] found enforcement bl at 0x400a30: b5 ff ff 97
+   [patcher] after patch:  1f 20 03 d5  (nop)
+   [patcher] enforcement bl neutralised. TracerPid(after)=0
+   [patcher] done -- the verdict now returns instead of killing the process.
+   => ALIVE (expected ALIVE)
+
+== C) mitigation: hardened self-CRC + same patch ==
+   [victim] pid=43
+   [victim] &security_verdict   = 0x4009d4
+   [victim] &enforce_termination= 0x4008c4
+   [victim] self-CRC ENABLED, baseline=0x86cbd3f9
+   [victim] arming window: 6s -- run the patcher now
+   [toy-rasp] verdict=HOSTILE (environment-check) -> terminating process
+   ty_verdict @ 0x4009d4 for a bl to 0x4008c4
+   [patcher] found enforcement bl at 0x400a0c: ae ff ff 97
+   [patcher] after patch:  1f 20 03 d5  (nop)
+   [patcher] enforcement bl neutralised. TracerPid(after)=0
+   [patcher] done -- the verdict now returns instead of killing the process.
+   => DEAD (expected DEAD)
+
+== RESULT ==
+   A baseline   : DEAD   (want DEAD)
+   B attack     : ALIVE   (want ALIVE)
+   C mitigation : DEAD   (want DEAD)
+   PASS
